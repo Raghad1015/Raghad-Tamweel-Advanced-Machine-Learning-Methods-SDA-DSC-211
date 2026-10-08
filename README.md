@@ -131,20 +131,6 @@ All preprocessing operations, including imputation and weighting, are fitted usi
 
 Potential post-decision variables are explicitly reviewed before modelling.
 
-| Feature | Risk | Action |
-| --- | --- | --- |
-| `[feature]` | `[description]` | `[KEEP / REMOVE]` |
-| `[feature]` | `[description]` | `[KEEP / REMOVE]` |
-| `[feature]` | `[description]` | `[KEEP / REMOVE]` |
-
-### Validation Results
-
-| Validation Scheme | Mean AP |
-| --- | --- |
-| Random split | `[ ]` |
-| Time-aware split | `[ ]` |
-| Time + customer-aware split | `[ ]` |
-| Tuned model | `[ ]` |
 <img width="953" height="386" alt="‏لقطة الشاشة ١٤٤٨-٠٤-٢٧ في ٣ ٥٩ ٤٣ م" src="https://github.com/user-attachments/assets/d6de7545-3111-477b-8434-8a9db72fb6b9" />
 
 
