@@ -1,11 +1,4 @@
 
-
-
-
-تمام. بما أنك تريد **نفس أسلوب الـREADME الذي أرسلته، لكن بدون اختلاق أي نتائج قبل تنفيذ المشروع**، فهذا قالب جاهز ومصمم بحيث يتوافق مع المتطلبات الإدارية والتقنية المنشورة للمشروع، ومنها قابلية التشغيل على Google Colab CPU، OOF، حد المراجعة 12%، التكلفة `10×FN + 1×FP`، calibration، interpretability، reproducibility، والتقارير المطلوبة.  GitHub+1
-
-:::writing{variant="document" id="73184" title="Tamweel Lite — README.md"}
-
 # Tamweel Lite — Cost-Aware Credit-Risk Review Policy
 
 An end-to-end tabular machine-learning project that predicts a **synthetic financing default within 90 days of application**. The project focuses on honest validation across time and customers, cost-sensitive decision-making under a **12% review capacity**, calibration, interpretability, and a reproducible final batch policy.
