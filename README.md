@@ -243,13 +243,13 @@ An ensemble is considered only if it provides stable improvement over the best s
 
 ### Model Comparison
 
-| Candidate | Mean AP | Fold SD | Brier | ECE | Decision |
-| --- | --- | --- | --- | --- | --- |
-| Logistic Regression | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
-| XGBoost | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
-| LightGBM | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
-| Weighted Ensemble | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
-| Stacking | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+
+
+<img width="973" height="611" alt="‏لقطة الشاشة ١٤٤٨-٠٤-٢٧ في ٤ ٢٢ ٥٤ م" src="https://github.com/user-attachments/assets/82db2f8c-08c5-4ed5-aafe-2dda3383fac0" />
+
+
+
+
 
 ### Final Decision
 
