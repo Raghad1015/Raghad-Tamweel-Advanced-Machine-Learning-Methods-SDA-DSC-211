@@ -42,7 +42,7 @@ Day	Focus	Main evidence
 ⸻
 Key results
 
-Day 1: baseline comparison
+###Day 1: baseline comparison
 
 On one random stratified split (2,000 comparison rows, about 158 positives), the three models ranked almost the same.
 Model	ROC-AUC	AP
@@ -52,9 +52,9 @@ XGBoost	0.8124	0.60 s
 
 Gaps near 0.01 on about 158 positives are within likely noise, so boosting showed no clear advantage. The split also shared customers across roles, which Day 2 corrected.
 
-Day 1 ROC and PR
+###Day 1 ROC and PR
 
-Day 2: honest validation
+###Day 2: honest validation
 
 Two fields (days_past_due_60 and [second field: see leakage_audit.csv]) are recorded after the request, so they were removed. Validation then used forward time folds, separated customers, and a 90-day label-maturity rule.
 
@@ -64,7 +64,7 @@ Two fields (days_past_due_60 and [second field: see leakage_audit.csv]) are reco
 
 Validation comparison
 
-Day 3: threshold under capacity (weighted LightGBM, OOF)
+###Day 3: threshold under capacity (weighted LightGBM, OOF)
 Rule	Loss units	Flag rate	Within 12% in every period
 Threshold 0.5	n/a here	19.9%	No
 Minimum loss, no capacity limit (0.4486)	2,275	22.6%	No
@@ -74,7 +74,7 @@ Respecting capacity costs 364 more loss units than the unconstrained minimum, an
 
 Capacity and regions
 
-Day 4: explanation and calibration (weighted LightGBM)
+###Day 4: explanation and calibration (weighted LightGBM)
 
 SHAP is in log-odds units. Mean absolute SHAP ranks bureau_score first (0.904), dti second (0.544) and loan_amount_sar third (0.349); permutation importance agrees on the top two. On two separate evaluation periods the sigmoid improved probabilities without changing ranking:
 Period	Rows / positives	Brier	ECE
@@ -83,7 +83,7 @@ Period	Rows / positives	Brier	ECE
 
 Adding a near-threshold review zone exceeded capacity in both periods (status CAPACITY_REVIEW_REQUIRED), so the threshold was not retuned on evaluation data. These explanations belong to the Day 4 model, not to the final Logistic Regression.
 
-Day 5: worth-it gate
+###Day 5: worth-it gate
 
 Three single models and three ensembles were compared on nested forward OOF predictions (2,155 rows; folds 2023Q1, 2023Q3, 2024Q1).
 Candidate	Mean AP	Fold SD	Brier	ECE	Passes gate
@@ -127,7 +127,7 @@ Monitoring plan
 
 Track each batch's pre-cap flag rate against 12%, score and input drift, and calibration. When 90-day outcomes mature, recheck AP, Brier and ECE and decide whether to keep the sigmoid. Review regional rates with their denominators. Develop any model or threshold change on new data, never on the batch being judged.
 ⸻
-Repository layout
+###Repository layout
 
 README.md
 reports/          MODEL_CARD.md, ENSEMBLE_DECISION.md, DECISION_CARD.md, INTERPRETABILITY_REPORT.md
