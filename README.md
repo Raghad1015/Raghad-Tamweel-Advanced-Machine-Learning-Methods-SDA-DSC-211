@@ -1,4 +1,10 @@
 
+
+
+
+
+
+
 # Tamweel Lite — Cost-Aware Credit-Risk Review Policy
 
 An end-to-end tabular machine-learning project that predicts a **synthetic financing default within 90 days of application**. The project focuses on honest validation across time and customers, cost-sensitive decision-making under a **12% review capacity**, calibration, interpretability, and a reproducible final batch policy.
@@ -176,6 +182,7 @@ Review rate ≤ 12%
 
 
 
+<img width="957" height="361" alt="‏لقطة الشاشة ١٤٤٨-٠٤-٢٧ في ٤ ١٦ ٥٢ م" src="https://github.com/user-attachments/assets/207474d0-6183-4aa8-af67-011fdf58f449" />
 
 
 
