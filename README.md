@@ -174,11 +174,8 @@ Review rate ≤ 12%
 
 ### Threshold Comparison
 
-| Threshold | Loss | Flag Rate | Feasible? |
-| --- | --- | --- | --- |
-| Default `0.50` | `[ ]` | `[ ]` | `[ ]` |
-| Unconstrained optimum | `[ ]` | `[ ]` | `[ ]` |
-| **Chosen threshold** | **\[ \]** | **\[ \]** | **Yes** |
+<img width="1044" height="295" alt="‏لقطة الشاشة ١٤٤٨-٠٤-٢٧ في ٤ ٣٢ ٤٦ م" src="https://github.com/user-attachments/assets/f00b0807-22ec-4161-9cf2-8ce4faea999d" />
+
 
 
 
