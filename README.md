@@ -1,3 +1,11 @@
+
+
+
+
+تمام. بما أنك تريد **نفس أسلوب الـREADME الذي أرسلته، لكن بدون اختلاق أي نتائج قبل تنفيذ المشروع**، فهذا قالب جاهز ومصمم بحيث يتوافق مع المتطلبات الإدارية والتقنية المنشورة للمشروع، ومنها قابلية التشغيل على Google Colab CPU، OOF، حد المراجعة 12%، التكلفة `10×FN + 1×FP`، calibration، interpretability، reproducibility، والتقارير المطلوبة.  GitHub+1
+
+:::writing{variant="document" id="73184" title="Tamweel Lite — README.md"}
+
 # Tamweel Lite — Cost-Aware Credit-Risk Review Policy
 
 An end-to-end tabular machine-learning project that predicts a **synthetic financing default within 90 days of application**. The project focuses on honest validation across time and customers, cost-sensitive decision-making under a **12% review capacity**, calibration, interpretability, and a reproducible final batch policy.
@@ -94,9 +102,9 @@ The first stage establishes a fair comparison between the selected candidate mod
 
 | Model | ROC-AUC | Average Precision | Train Time |
 | --- | --- | --- | --- |
-| Logistic Regression | `[ 0.8213	]` | `[ 0.3258	]` | `[ 0.0645]` |
-| XGBoost | `[ 0.8124	]` | `[0.3338 ]` | `[ 0.4209]` |
-| LightGBM | `[0.8138 ]` | `[ 0.3248]` | `[0.3309 ]` |
+| Logistic Regression | `[ 0.8213]` | `[0.3258 ]` | `[ 0.0645]` |
+| XGBoost | `[0.8214 ]` | `[0.3338 ]` | `[ 0.4209]` |
+| LightGBM | `[ 0.8138]` | `[ 0.3248]` | `[ 0.3309]` |
 
 ### Interpretation
 
@@ -138,6 +146,10 @@ Potential post-decision variables are explicitly reviewed before modelling.
 | Time-aware split | `[ ]` |
 | Time + customer-aware split | `[ ]` |
 | Tuned model | `[ ]` |
+<img width="953" height="386" alt="‏لقطة الشاشة ١٤٤٨-٠٤-٢٧ في ٣ ٥٩ ٤٣ م" src="https://github.com/user-attachments/assets/d6de7545-3111-477b-8434-8a9db72fb6b9" />
+
+
+
 
 The final validation scheme is selected based on temporal realism, customer separation, target maturity, and leakage prevention.
 
@@ -168,6 +180,11 @@ Review rate ≤ 12%
 | Default `0.50` | `[ ]` | `[ ]` | `[ ]` |
 | Unconstrained optimum | `[ ]` | `[ ]` | `[ ]` |
 | **Chosen threshold** | **\[ \]** | **\[ \]** | **Yes** |
+
+
+
+
+
 
 The selected threshold is the **minimum-loss feasible threshold under the 12% capacity constraint**, based on the prescribed OOF procedure.
 
@@ -551,4 +568,4 @@ This project is completed as part of:
 **Provider:** SDAIA Academy via Learning Space **Project Type:** Individual Five-Day Project **Session:** October 2026
 
 Training-program reference: [SDAIA Academy on GitHub](<https://github.com/SDAIAAcademy?utm_source=chatgpt.com>)
-
+.
