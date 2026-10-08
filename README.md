@@ -94,9 +94,9 @@ The first stage establishes a fair comparison between the selected candidate mod
 
 | Model | ROC-AUC | Average Precision | Train Time |
 | --- | --- | --- | --- |
-| Logistic Regression | `[ ]` | `[ ]` | `[ ]` |
-| XGBoost | `[ ]` | `[ ]` | `[ ]` |
-| LightGBM | `[ ]` | `[ ]` | `[ ]` |
+| Logistic Regression | `[ 0.8213	]` | `[ 0.3258	]` | `[ 0.0645]` |
+| XGBoost | `[ 0.8124	]` | `[0.3338 ]` | `[ 0.4209]` |
+| LightGBM | `[0.8138 ]` | `[ 0.3248]` | `[0.3309 ]` |
 
 ### Interpretation
 
@@ -552,27 +552,3 @@ This project is completed as part of:
 
 Training-program reference: [SDAIA Academy on GitHub](<https://github.com/SDAIAAcademy?utm_source=chatgpt.com>)
 
----
-
-# Status
-
-**Project Status:** `IN PROGRESS`
-
-| Component | Status |
-| --- | --- |
-| Data audit | ⬜ Pending |
-| Day 1 modelling | ⬜ Pending |
-| Day 2 validation | ⬜ Pending |
-| Day 3 threshold policy | ⬜ Pending |
-| Day 4 interpretability | ⬜ Pending |
-| Day 5 final model | ⬜ Pending |
-| Decision Card | ⬜ Pending |
-| Interpretability Report | ⬜ Pending |
-| Ensemble Decision | ⬜ Pending |
-| Model Card | ⬜ Pending |
-| Submission | ⬜ Pending |
-| Final presentation | ⬜ Pending |
-| Reproducibility check | ⬜ Pending |
-| Final tag + SHA | ⬜ Pending |
-| ::: |  |
-.
