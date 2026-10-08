@@ -1,153 +1,578 @@
-# Raghad-Tamweel-AdvancedMachineLearningMethods-SDA-DSC211
+# Tamweel Lite — Cost-Aware Credit-Risk Review Policy
 
+An end-to-end tabular machine-learning project that predicts a **synthetic financing default within 90 days of application**. The project focuses on honest validation across time and customers, cost-sensitive decision-making under a **12% review capacity**, calibration, interpretability, and a reproducible final batch policy.
 
+**Course:** SDA-DSC-211 — Advanced Machine Learning Methods (SDAIA Academy) **Project Type:** Individual Five-Day Project **Session:** October 2026
 
+> **Educational use only.** All data is fully synthetic. A `decision = 1` means _refer for review_ within a simulation. It is not an approval, a refusal, or a statement about any real person or region.
 
-Tamweel Lite: Cost-Aware Review Policy for Synthetic Financing Requests
+---
 
-A five-day tabular machine-learning project. It predicts a synthetic default within 90 days of a financing request, validates the model across time and customers, picks a cost-sensitive threshold under a 12% review capacity, checks calibration and explanations, and delivers a reproducible batch policy.
+## Final Decision at a Glance
 
-Course: SDA-DSC-211, Advanced Machine Learning Methods. Type: individual project.
+| Item | Result |
+| --- | --- |
+| Final model | **\[MODEL NAME\]** |
+| Mean OOF Average Precision | **\[AP\]** |
+| OOF fold SD | **\[SD\]** |
+| Decision threshold | **\[THRESHOLD\]** |
+| OOF recall | **\[RECALL\]%** |
+| OOF precision | **\[PRECISION\]%** |
+| Review capacity | **\[FLAG RATE\]%** |
+| Decision loss | **\[LOSS\] units** |
+| Challenge batch | **\[N\] applications** |
+| Applications flagged | **\[N\]** |
+| Challenge performance | **Not claimed — challenge labels are unavailable** |
 
-Educational use only. All data is synthetic. decision = 1 means refer for review inside a simulation. It is not an approval, a refusal, or a statement about any real person or region.
-⸻
-Result at a glance
-Item	Result
-Final model	Logistic Regression (gate decision: KEEP SINGLE)
-Mean OOF average precision	0.392 (three forward folds, fold SD 0.030)
-Decision rule	flag if calibrated probability >= 0.12226 (raw OOF threshold 0.16892)
-OOF at the raw threshold	245 flags of 2,155 (11.4%), recall 46.9%, precision 34.3%, 84 of 179 defaults caught
-OOF teaching loss	1,111 units (10 x missed default + 1 x false alarm)
-Challenge batch	2,500 requests, 330 above threshold, 300 flagged after the 12% cap
-Challenge performance	Not claimed. Challenge labels are unavailable.
+> Final values will be populated only from the executed project outputs. No metrics are manually entered or fabricated.
 
-Ensemble comparison
-⸻
-Problem
+---
 
-A review team can examine only a limited share of new requests. Missing a future default costs 10 times a false alarm, and the team can review at most 12% of requests per period.
+## The Problem
 
-- Target: default_within_90d, a synthetic event within 90 days after the request.
-- Inputs: 22 features available at request time. No identifiers, dates or target in the inputs.
-- Challenge set: 2,500 unlabeled requests from customers who do not appear in training.
-- Loss: 10 x FN + 1 x FP, in educational units, not real money.
-⸻
-What each day established
-Day	Focus	Main evidence
-1	Baseline versus boosting	day1_model_comparison.csv, day1_roc_pr.png
-2	Leakage audit, time- and customer-aware validation	leakage_audit.csv, validation_summary.csv
-3	Imbalance, threshold sweep, capacity, regional audit	DECISION_CARD.md, threshold_metrics.json
-4	SHAP, permutation importance, calibration, stability	INTERPRETABILITY_REPORT.md
-5	Worth-it gate, final model, batch policy, delivery	MODEL_CARD.md, ENSEMBLE_DECISION.md, submission.csv
-⸻
-Key results
+A lender has a limited review team and must decide which new applications should be referred for additional review.
 
-###Day 1: baseline comparison
+The educational policy assigns:
 
-On one random stratified split (2,000 comparison rows, about 158 positives), the three models ranked almost the same.
-Model	ROC-AUC	AP
-Logistic Regression	0.8213	0.016 s
-LightGBM	0.8138	0.62 s
-XGBoost	0.8124	0.60 s
+- **10× cost** to a false negative (`FN`)
+- **1× cost** to a false positive (`FP`)
+- A maximum review capacity of **12% per validation period**
 
-Gaps near 0.01 on about 158 positives are within likely noise, so boosting showed no clear advantage. The split also shared customers across roles, which Day 2 corrected.
+The goal is therefore not simply to maximize accuracy. The project aims to identify a model and decision threshold that provide useful ranking performance while respecting the operational review constraint.
 
-###Day 1 ROC and PR
+### Target
 
-###Day 2: honest validation
+`default_within_90d = 1`
 
-Two fields (days_past_due_60 and [second field: see leakage_audit.csv]) are recorded after the request, so they were removed. Validation then used forward time folds, separated customers, and a 90-day label-maturity rule.
+The target represents a **synthetic financing default occurring within 90 days after application**.
 
-- AP gap, leaky random minus clean random: 0.6879.
-- AP gap, clean random minus honest time-and-customer fixed: -0.0044.
-- Only 3 folds, and about 50% of rows (4,961) are warm-up rows with no outer OOF prediction.
+It does not mean that the application was 90 days past due.
 
-Validation comparison
+---
 
-###Day 3: threshold under capacity (weighted LightGBM, OOF)
-Rule	Loss units	Flag rate	Within 12% in every period
-Threshold 0.5	n/a here	19.9%	No
-Minimum loss, no capacity limit (0.4486)	2,275	22.6%	No
-Minimum loss within capacity (0.6583)	2,639	10.4%	Yes
+## Project Objectives
 
-Respecting capacity costs 364 more loss units than the unconstrained minimum, and recall falls from 0.641 to 0.409 while precision rises from 0.216 to 0.299. Changing the missed-default cost between 8 and 12 did not change the threshold: capacity drives the decision.
+The project is designed to:
 
-Capacity and regions
+1. Build a reliable tabular classification pipeline.
+2. Prevent temporal and customer-level leakage.
+3. Compare baseline and machine-learning models fairly.
+4. Validate using honest time- and customer-aware splits.
+5. Select a decision threshold using OOF predictions.
+6. Apply the `10 × FN + 1 × FP` educational cost policy.
+7. Respect the **12% review-capacity constraint**.
+8. Evaluate probability calibration using Brier score, ECE, and reliability curves.
+9. Interpret the final model using appropriate explanation methods.
+10. Evaluate whether an ensemble provides stable additional value.
+11. Produce a reproducible inference pipeline and final batch policy.
 
-###Day 4: explanation and calibration (weighted LightGBM)
+---
 
-SHAP is in log-odds units. Mean absolute SHAP ranks bureau_score first (0.904), dti second (0.544) and loan_amount_sar third (0.349); permutation importance agrees on the top two. On two separate evaluation periods the sigmoid improved probabilities without changing ranking:
-Period	Rows / positives	Brier	ECE
-2024Q3	836 / 78	0.1153 to 0.0776	0.1340 to 0.0323
-2024Q4	897 / 61	0.1109 to 0.0573	0.1589 to 0.0243
+## Five-Day Build
 
-Adding a near-threshold review zone exceeded capacity in both periods (status CAPACITY_REVIEW_REQUIRED), so the threshold was not retuned on evaluation data. These explanations belong to the Day 4 model, not to the final Logistic Regression.
+| Day | Focus | Main Evidence |
+| --- | --- | --- |
+| **1** | Baseline and model comparison | `day1_model_comparison.csv`, ROC/PR curves |
+| **2** | Leakage audit and honest validation | `leakage_audit.csv`, `fold_audit.csv`, `validation_summary.csv` |
+| **3** | Cost-sensitive threshold and capacity policy | `DECISION_CARD.md`, `threshold_metrics.json` |
+| **4** | Interpretability, calibration and stability | `INTERPRETABILITY_REPORT.md` |
+| **5** | Ensemble gate, final model and delivery | `ENSEMBLE_DECISION.md`, `MODEL_CARD.md`, `submission.csv` |
 
-###Day 5: worth-it gate
+---
 
-Three single models and three ensembles were compared on nested forward OOF predictions (2,155 rows; folds 2023Q1, 2023Q3, 2024Q1).
-Candidate	Mean AP	Fold SD	Brier	ECE	Passes gate
-Logistic	0.392	0.030	0.0633	0.0188	reference
-Weighted	0.389	0.029	0.0633	0.0177	No
-Stack	0.383	0.029	0.0660	0.0311	No
-Equal	0.372	0.033	0.0644	0.0204	No
-XGBoost	0.353	0.029	0.0657	0.0228	No
-LightGBM	0.345	0.043	0.0661	0.0231	No
+# Day 1 — Baseline and Model Comparison
 
-The closest ensemble trails Logistic by 0.002, far below the fold SD, so no ensemble earned its extra complexity. Decision: KEEP SINGLE.
+The first stage establishes a fair comparison between the selected candidate models using the same comparison data and preprocessing logic.
 
-Calibration of the final model. A sigmoid was fitted on a reserved set (836 rows, 78 positives). It did not help on those rows: Brier 0.0765 to 0.0781, ECE 0.0211 to 0.0349, log loss 0.266 to 0.277. AP (0.288) and ROC-AUC (0.789) are unchanged because the mapping preserves order. These are fit diagnostics on the rows that trained the sigmoid, not an independent test.
+### Models
 
-Calibration fit
+- Logistic Regression
+- XGBoost
+- LightGBM
 
-Batch policy. The frozen threshold is applied first, then the highest-probability requests are kept up to the 12% cap. Of 2,500 requests, 330 passed the threshold and 300 were flagged; 30 were removed at boundary score 0.1299.
+### Results
 
-Challenge capacity
+| Model | ROC-AUC | Average Precision | Train Time |
+| --- | --- | --- | --- |
+| Logistic Regression | `[ ]` | `[ ]` | `[ ]` |
+| XGBoost | `[ ]` | `[ ]` | `[ ]` |
+| LightGBM | `[ ]` | `[ ]` | `[ ]` |
 
-Regional OOF audit (descriptive).
-Region	Negatives	False-positive rate	Recall
-eastern	507	6.3%	45.7%
-central	489	8.0%	50.0%
-other	494	8.1%	46.9%
-western	486	10.3%	44.7%
+### Interpretation
 
-Each region has only 35 to 49 positives, so part of the gap may be noise. This is not a fairness certificate.
-⸻
-Limitations
+The Day 1 comparison identifies the initial candidate model based on ranking performance, computational cost, and practical simplicity.
 
-- Evidence comes from out-of-fold predictions on data used throughout the course. It is not an untouched final test.
-- The threshold was chosen on the same OOF labels used to report its loss, so 1,111 units is optimistic.
-- Fold SD comes from three overlapping folds and is descriptive, not a confidence interval.
-- The sigmoid did not improve calibration on the reserved set, so probability values should be monitored.
-- The challenge batch was 13.2% above threshold before capping, against 11.4% in OOF, which may indicate score drift or a riskier batch.
-- Day 4 explanations do not describe the final model; its coefficients and case-level reasons still need review.
-- Never use this model for real lending or conclusions about real people or regions.
+**Selected candidate:** `[MODEL]`
 
-Monitoring plan
+!Day 1 ROC and PR curves
 
-Track each batch's pre-cap flag rate against 12%, score and input drift, and calibration. When 90-day outcomes mature, recheck AP, Brier and ECE and decide whether to keep the sigmoid. Review regional rates with their denominators. Develop any model or threshold change on new data, never on the batch being judged.
-⸻
-###Repository layout
+---
 
-README.md
-reports/          MODEL_CARD.md, ENSEMBLE_DECISION.md, DECISION_CARD.md, INTERPRETABILITY_REPORT.md
-submission/       submission.csv (application_id, probability, decision)
-notebooks/        executed notebooks 01 to 05
-artifacts/        CSV, JSON and figures from every day, final_model/, final_policy.json
-evidence/         day1 to day4 evidence bundles, as exported
-scripts/          course pipeline, inference and replay scripts
-data/             synthetic data and data contract
-presentation/     five-slide PDF
+# Day 2 — Honest Validation and Leakage Control
 
+A major objective of the project is to avoid overly optimistic validation.
 
-Reproduce
+The validation design separates observations across:
 
-Each notebook runs on free Google Colab CPU and keeps its saved outputs. scripts/replay_final.py checks that the saved submission is reproduced exactly from the exported model without retraining, and scripts/rebuild_final.py retrains from the data.
+- **Time**
+- **Customers**
+- **Target maturity**
 
-Data
+All preprocessing operations, including imputation and weighting, are fitted using training rows only.
 
-Fully synthetic and created for the course. It contains no real customers and no real regional or demographic statistics. Monetary values are simulated riyals and losses are educational units.
-⸻
-الملخص التنفيذي
+### Leakage Audit
 
-تم اختيار KEEP SINGLE باستخدام Logistic Regression لأن متوسط AP (على ثلاث طيات) بلغ 0.39166 ولم ينجح أي من نماذج التجميع في تجاوز بوابة الجدوى المحددة مسبقًا. تم تثبيت سياسة القرار والمعايرة، وعند تطبيق النموذج على 2,500 طلب تحدٍ تجاوز 330 طلبًا العتبة، ثم خفّض سقف السعة 12% العدد النهائي إلى 300 إشارة مراجعة. النموذج مخصص للتدريب على بيانات اصطناعية ولا يصلح لاتخاذ قرارات تمويل حقيقية.
+Potential post-decision variables are explicitly reviewed before modelling.
+
+| Feature | Risk | Action |
+| --- | --- | --- |
+| `[feature]` | `[description]` | `[KEEP / REMOVE]` |
+| `[feature]` | `[description]` | `[KEEP / REMOVE]` |
+| `[feature]` | `[description]` | `[KEEP / REMOVE]` |
+
+### Validation Results
+
+| Validation Scheme | Mean AP |
+| --- | --- |
+| Random split | `[ ]` |
+| Time-aware split | `[ ]` |
+| Time + customer-aware split | `[ ]` |
+| Tuned model | `[ ]` |
+
+The final validation scheme is selected based on temporal realism, customer separation, target maturity, and leakage prevention.
+
+!Validation comparison
+
+---
+
+# Day 3 — Cost-Sensitive Threshold Under 12% Capacity
+
+The model probability is converted into a review decision using a threshold selected from **OOF predictions**.
+
+The educational loss function is:
+
+```
+Loss = 10 × FN + 1 × FP
+```
+
+The review capacity must remain:
+
+```
+Review rate ≤ 12%
+```
+
+### Threshold Comparison
+
+| Threshold | Loss | Flag Rate | Feasible? |
+| --- | --- | --- | --- |
+| Default `0.50` | `[ ]` | `[ ]` | `[ ]` |
+| Unconstrained optimum | `[ ]` | `[ ]` | `[ ]` |
+| **Chosen threshold** | **\[ \]** | **\[ \]** | **Yes** |
+
+The selected threshold is the **minimum-loss feasible threshold under the 12% capacity constraint**, based on the prescribed OOF procedure.
+
+!Capacity and threshold analysis
+
+---
+
+# Day 4 — Interpretability and Calibration
+
+## Interpretability
+
+The project uses model-appropriate explanation methods to understand how features influence predictions.
+
+Where applicable:
+
+- SHAP
+- Permutation importance
+- Feature contribution analysis
+
+SHAP explanations describe the behavior of the fitted model. They **do not establish causality, fairness, or legal compliance**.
+
+!Feature importance
+
+## Calibration
+
+Probability quality is evaluated separately from ranking quality.
+
+The project reports:
+
+- Brier Score
+- Expected Calibration Error (ECE)
+- Reliability Curve
+- Log-loss
+
+### Calibration Results
+
+| Metric | Raw | Calibrated |
+| --- | --- | --- |
+| Brier | `[ ]` | `[ ]` |
+| ECE | `[ ]` | `[ ]` |
+| Log-loss | `[ ]` | `[ ]` |
+| ROC-AUC | `[ ]` | `[ ]` |
+| Average Precision | `[ ]` | `[ ]` |
+
+Calibration is learned using calibration rows only and frozen before policy or evaluation use.
+
+!Calibration curve
+
+---
+
+# Day 5 — Ensemble Worth-It Gate
+
+The final model is selected using a documented **Worth-It Gate**.
+
+An ensemble is considered only if it provides stable improvement over the best single model without unacceptable deterioration in calibration or other required metrics.
+
+### Model Comparison
+
+| Candidate | Mean AP | Fold SD | Brier | ECE | Decision |
+| --- | --- | --- | --- | --- | --- |
+| Logistic Regression | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| XGBoost | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| LightGBM | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| Weighted Ensemble | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| Stacking | `[ ]` | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+
+### Final Decision
+
+**`[KEEP_SINGLE_MODEL / SHIP_ENSEMBLE]`**
+
+The final choice is based on measured evidence rather than model complexity alone.
+
+!Ensemble comparison
+
+---
+
+# Final Batch Policy
+
+The final policy follows a fixed sequence:
+
+```
+New application
+       ↓
+Feature preprocessing
+       ↓
+Final model
+       ↓
+Probability
+       ↓
+Frozen threshold
+       ↓
+Review decision
+       ↓
+12% capacity check
+       ↓
+Final batch output
+```
+
+If more than 12% of applications pass the threshold, the policy applies the documented capacity rule and retains the highest-priority applications according to the frozen policy.
+
+### Final Output
+
+The inference interface returns:
+
+```
+application_id
+probability
+decision
+```
+
+The final submission is stored in:
+
+```
+submission.csv
+```
+
+---
+
+# Regional Audit
+
+Regional results are reported descriptively and are not interpreted as a fairness certificate.
+
+| Region | Flag Rate | False Positive Rate | Recall | N |
+| --- | --- | --- | --- | --- |
+| Eastern | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| Central | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| Western | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+| Other | `[ ]` | `[ ]` | `[ ]` | `[ ]` |
+
+Small subgroup counts may produce unstable estimates. Any notable differences are treated as monitoring signals requiring further investigation.
+
+---
+
+# Limitations
+
+- The data is fully synthetic and does not represent real customers.
+- Challenge labels are unavailable; therefore, challenge performance is **not claimed**.
+- OOF results are development evidence and are not equivalent to an untouched final test set.
+- Threshold selection can introduce optimism when the same OOF predictions are used for reporting.
+- Fold-level variation is descriptive and should not automatically be interpreted as a confidence interval.
+- Calibration may not improve probability quality and should therefore be monitored.
+- Regional metrics are descriptive and do not constitute a fairness certification.
+- Model explanations describe model behavior and do not establish causality.
+- The system is designed for educational purposes and must not be used for real financing decisions.
+
+---
+
+# Monitoring Plan
+
+After deployment-style simulation, monitor:
+
+- Pre-cap review rate against the **12% limit**.
+- Probability and score distributions.
+- Observed target prevalence after outcomes mature.
+- Average Precision.
+- Brier Score.
+- ECE.
+- Calibration stability.
+- Regional false-positive rate and recall.
+- Changes in data and feature distributions.
+
+Any model or threshold change must be developed and validated using new eligible data rather than the batch being evaluated.
+
+---
+
+# Repository Structure
+
+```
+├── README.md
+├── ADMINISTRATIVE_REQUIREMENTS.md
+├── TECHNICAL_REQUIREMENTS.md
+│
+├── MODEL_CARD.md
+├── DECISION_CARD.md
+├── INTERPRETABILITY_REPORT.md
+├── ENSEMBLE_DECISION.md
+│
+├── submission.csv
+├── metrics.json
+│
+├── notebooks/
+│   ├── 00_environment_and_data.ipynb
+│   ├── 01_day1_model_comparison.ipynb
+│   ├── 02_day2_validation.ipynb
+│   ├── 03_day3_threshold_policy.ipynb
+│   ├── 04_day4_interpretability.ipynb
+│   ├── 05_day5_final_model.ipynb
+│   └── 99_final_check.ipynb
+│
+├── artifacts/
+│   ├── day1/
+│   ├── day2/
+│   ├── day3/
+│   ├── day4/
+│   ├── day5/
+│   ├── final_model/
+│   └── final_policy.json
+│
+├── evidence/
+│   ├── day1/
+│   ├── day2/
+│   ├── day3/
+│   └── day4/
+│
+├── reports/
+├── submission/
+├── tamweel/
+├── scripts/
+├── data/
+├── presentation/
+│   └── final_presentation.pdf
+│
+├── requirements-colab.txt
+├── constraints.txt
+└── environment.json
+```
+
+---
+
+# Reproducibility
+
+The project is designed to run on **free Google Colab CPU** without:
+
+- Paid services
+- API keys
+- GPU
+- Required Google Drive mounting
+- Local installation dependencies
+
+The project records:
+
+- Random seeds
+- Package versions
+- Model parameters
+- Data hashes
+- Provenance
+- Generated artifacts
+- Repository commit SHA
+
+### Replay
+
+```
+pip install -r requirements-colab.txt -c constraints.txt
+
+cd scripts
+
+python replay_final.py
+```
+
+Expected successful output:
+
+```
+REPLAY_MATCH
+```
+
+A full rebuild can be executed using:
+
+```
+python rebuild_final.py
+```
+
+The final repository must reproduce the submitted probabilities and outputs from the recorded source version.
+
+---
+
+# Data
+
+All Tamweel Lite data is **synthetic course data**.
+
+It contains:
+
+- No real customers
+- No real financing records
+- No real regional statistics
+- No real demographic information
+
+The challenge labels remain unavailable to the learner workflow.
+
+All monetary values and decision losses are simulated for educational purposes.
+
+---
+
+# Required Project Evidence
+
+The final repository contains the following key evidence:
+
+| Evidence | File |
+| --- | --- |
+| Decision policy | `DECISION_CARD.md` |
+| Model explanation | `INTERPRETABILITY_REPORT.md` |
+| Ensemble decision | `ENSEMBLE_DECISION.md` |
+| Final model documentation | `MODEL_CARD.md` |
+| Final predictions | `submission.csv` |
+| Final metrics | `metrics.json` |
+| Frozen policy | `artifacts/final_policy.json` |
+| Final model | `artifacts/final_model/` |
+| Reproducibility | `environment.json` \+ manifest |
+| Final presentation | `presentation/final_presentation.pdf` |
+
+---
+
+# Administrative Compliance
+
+This repository follows the SDA-DSC-211 administrative requirements, including:
+
+- Official student repository structure.
+- Professional README documentation.
+- Technical documentation and provenance.
+- Meaningful Git history.
+- Required project reports.
+- Five-slide final presentation.
+- Final commit and tag.
+- Exact commit SHA recording.
+- Reproducible final bundle.
+- Appropriate disclosure of sources and assistance.
+- No private personal information or challenge labels.
+
+The administrative requirements define the repository, documentation, submission, version-control, reporting, presentation, and defence expectations.  GitHub
+
+---
+
+# Technical Compliance
+
+The project follows the required technical contract:
+
+- Free Google Colab CPU environment.
+- Synthetic course data only.
+- Training-only preprocessing.
+- Honest OOF predictions.
+- `10 × FN + 1 × FP` decision loss.
+- Maximum **12% review capacity**.
+- Model-appropriate interpretability.
+- Calibration learned on calibration data only.
+- Documented ensemble Worth-It Gate.
+- Reproducible inference interface.
+- Recorded seeds, versions, hashes and provenance.
+- No fabricated metrics, outputs, commits or timestamps.
+
+These requirements are defined in the official technical requirements for the project.  GitHub
+
+---
+
+# Executive Summary
+
+## English
+
+Tamweel Lite is an end-to-end educational machine-learning project for predicting synthetic financing defaults within 90 days of application. The project emphasizes honest validation across time and customers, leakage prevention, cost-sensitive threshold selection, a 12% review-capacity constraint, calibration, interpretability, and reproducible batch inference.
+
+The final model, threshold, calibration approach, and ensemble decision will be selected strictly from executed project evidence and documented in the final repository.
+
+## الملخص التنفيذي
+
+**Tamweel Lite** هو مشروع متكامل في تعلم الآلة يهدف إلى التنبؤ بالتعثر التمويلي الاصطناعي خلال 90 يومًا من تاريخ التقديم.
+
+يركز المشروع على:
+
+- التحقق الزمني وعلى مستوى العملاء.
+- منع تسرب البيانات.
+- اختيار عتبة قرار تراعي التكلفة.
+- الالتزام بسعة مراجعة لا تتجاوز **12%**.
+- تقييم معايرة الاحتمالات.
+- تفسير النموذج.
+- بناء سياسة نهائية قابلة لإعادة الإنتاج.
+
+سيتم اختيار النموذج والعتبة وسياسة المعايرة وقرار استخدام التجميع بناءً على النتائج الفعلية الناتجة من تنفيذ المشروع، وليس على نتائج مفترضة.
+
+---
+
+# Educational Disclaimer
+
+> This project is for educational purposes only. All data is synthetic. The model and decision policy are part of a course simulation and must not be used to make real financing, credit, regional, demographic, or individual-level decisions.
+
+---
+
+# Training Programme
+
+This project is completed as part of:
+
+**SDA-DSC-211 — Advanced Machine Learning Methods**
+
+**Provider:** SDAIA Academy via Learning Space **Project Type:** Individual Five-Day Project **Session:** October 2026
+
+Training-program reference: [SDAIA Academy on GitHub](<https://github.com/SDAIAAcademy?utm_source=chatgpt.com>)
+
+---
+
+# Status
+
+**Project Status:** `IN PROGRESS`
+
+| Component | Status |
+| --- | --- |
+| Data audit | ⬜ Pending |
+| Day 1 modelling | ⬜ Pending |
+| Day 2 validation | ⬜ Pending |
+| Day 3 threshold policy | ⬜ Pending |
+| Day 4 interpretability | ⬜ Pending |
+| Day 5 final model | ⬜ Pending |
+| Decision Card | ⬜ Pending |
+| Interpretability Report | ⬜ Pending |
+| Ensemble Decision | ⬜ Pending |
+| Model Card | ⬜ Pending |
+| Submission | ⬜ Pending |
+| Final presentation | ⬜ Pending |
+| Reproducibility check | ⬜ Pending |
+| Final tag + SHA | ⬜ Pending |
+| ::: |  |
+.
