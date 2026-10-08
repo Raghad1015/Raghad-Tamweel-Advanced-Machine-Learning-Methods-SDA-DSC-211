@@ -189,34 +189,11 @@ Where applicable:
 
 SHAP explanations describe the behavior of the fitted model. They **do not establish causality, fairness, or legal compliance**.
 
-!Feature importance
+<img width="1031" height="589" alt="‏لقطة الشاشة ١٤٤٨-٠٤-٢٧ في ٤ ٤١ ٠٠ م" src="https://github.com/user-attachments/assets/3dac5408-49d2-4d0d-b9f3-de6a5750351a" />
+<img width="488" height="368" alt="‏لقطة الشاشة ١٤٤٨-٠٤-٢٧ في ٤ ٣٨ ٠١ م" src="https://github.com/user-attachments/assets/363b0452-eedf-45e1-8eb1-ebadde7c5d23" />
 
-## Calibration
 
-Probability quality is evaluated separately from ranking quality.
 
-The project reports:
-
-- Brier Score
-- Expected Calibration Error (ECE)
-- Reliability Curve
-- Log-loss
-
-### Calibration Results
-
-| Metric | Raw | Calibrated |
-| --- | --- | --- |
-| Brier | `[ ]` | `[ ]` |
-| ECE | `[ ]` | `[ ]` |
-| Log-loss | `[ ]` | `[ ]` |
-| ROC-AUC | `[ ]` | `[ ]` |
-| Average Precision | `[ ]` | `[ ]` |
-
-Calibration is learned using calibration rows only and frozen before policy or evaluation use.
-
-!Calibration curve
-
----
 
 # Day 5 — Ensemble Worth-It Gate
 
